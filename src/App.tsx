@@ -1,30 +1,13 @@
-import { useState } from "react";
+import styled from "styled-components";
 
 function App() {
-  const [username, setUsername] = useState("");
-  const onChange = (e: React.FormEvent<HTMLInputElement>) => {
-    const {
-      currentTarget: { value },
-    } = e;
-    setUsername(value);
-  };
-  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    console.log("hello", username);
-  };
-  return (
-    <div>
-      <form onSubmit={onSubmit}>
-        <input
-          value={username}
-          onChange={onChange}
-          type="text"
-          placeholder="username"
-        />
-        <button>Login</button>
-      </form>
-    </div>
-  );
+  return <Container><H1>TypeScript!</H1></Container>;
 }
+const Container = styled.div`
+  background-color: ${(props) => props.theme.bgColor};
+`;
+const H1 = styled.h1`
+  color: ${(props) => props.theme.textColor};
+`;
 
 export default App;
