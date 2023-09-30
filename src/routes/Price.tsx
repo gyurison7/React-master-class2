@@ -76,7 +76,7 @@ const Container = styled.div`
 const PriceItem = styled.div<PriceItemProps>`
   display: flex;
   justify-content: space-between;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: ${props => props.theme.itemColor};;
   padding: 10px 20px;
   border-radius: 10px;
   margin-bottom: 20px;

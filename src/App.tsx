@@ -1,6 +1,12 @@
-import { createGlobalStyle } from "styled-components";
 import Router from "./Router";
-import { ReactQueryDevtools } from 'react-query/devtools';
+import styled, { createGlobalStyle } from "styled-components";
+import { ReactQueryDevtools } from "react-query/devtools";
+import { ThemeProvider } from "styled-components";
+import { darkTheme, lightTheme } from "./theme";
+import { useRecoilState } from "recoil";
+import { themeState } from "./atom";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCircleHalfStroke } from "@fortawesome/free-solid-svg-icons";
 
 const GlobalStyle = createGlobalStyle`
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300&display=swap');
@@ -57,8 +63,8 @@ table {
 body {
   font-weight: 300;
   font-family: 'Noto Sans KR', sans-serif;
-  background-color: ${props => props.theme.bgColor};
-  color: ${props => props.theme.textColor};
+  background-color: ${(props) => props.theme.bgColor};
+  color: ${(props) => props.theme.textColor};
   line-height: 1.2;
 }
 a {
@@ -68,13 +74,29 @@ a {
 `;
 
 function App() {
+  const [themeMode, setThemeMode] = useRecoilState(themeState);
+  const changeTheme = () => {
+    setThemeMode((prevMode) => (prevMode === "light" ? "dark" : "light"));
+  };
+
   return (
-    <>
+    <ThemeProvider theme={themeMode === "light" ? lightTheme : darkTheme}>
       <GlobalStyle />
       <Router />
-      <ReactQueryDevtools initialIsOpen={true}/>
-    </>
+      <ReactQueryDevtools initialIsOpen={true} />
+      <ToggleButton icon={faCircleHalfStroke} onClick={changeTheme} />
+    </ThemeProvider>
   );
 }
+
+const ToggleButton = styled(FontAwesomeIcon)`
+  position: fixed;
+  width: 30px;
+  height: 30px;
+  bottom: 20px;
+  right: 20px;
+  cursor: pointer;
+  z-index: 1000;
+`;
 
 export default App;
