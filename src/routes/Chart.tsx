@@ -1,6 +1,7 @@
 import { useQuery } from "react-query";
 import { fetchCoinHistory } from "../api";
 import ApexCharts from "react-apexcharts";
+import { useTheme } from "styled-components";
 
 interface ChartProps {
   coinId?: string;
@@ -21,6 +22,8 @@ export function Chart({ coinId }: ChartProps) {
   const { isLoading, data } = useQuery<IHistorical[]>(["ohlcv", coinId], () =>
     fetchCoinHistory(coinId || "")
   );
+  const theme = useTheme();
+
   return (
     <div>
       {isLoading ? (
@@ -54,6 +57,18 @@ export function Chart({ coinId }: ChartProps) {
             },
             xaxis: {
               type: "datetime",
+              labels: {
+                style: {
+                  colors: Array(7).fill(theme.textColor),
+                },
+              },
+            },
+            yaxis: {
+              labels: {
+                style: {
+                  colors: Array(7).fill(theme.textColor),
+                },
+              },
             },
           }}
         />
