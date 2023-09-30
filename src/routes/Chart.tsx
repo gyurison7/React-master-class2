@@ -1,7 +1,10 @@
-import { useParams } from "react-router-dom";
 import { useQuery } from "react-query";
 import { fetchCoinHistory } from "../api";
 import ApexCharts from "react-apexcharts";
+
+interface ChartProps {
+  coinId?: string;
+}
 
 interface IHistorical {
   time_open: number;
@@ -14,8 +17,7 @@ interface IHistorical {
   market_cap: number;
 }
 
-function Chart() {
-  const { coinId } = useParams();
+export function Chart({ coinId }: ChartProps) {
   const { isLoading, data } = useQuery<IHistorical[]>(["ohlcv", coinId], () =>
     fetchCoinHistory(coinId || "")
   );
@@ -25,48 +27,33 @@ function Chart() {
         "Loading..."
       ) : (
         <ApexCharts
-          type="line"
+          type="candlestick"
           series={[
             {
-              name: "Price",
-              data: data?.map((price) => parseFloat(price.close)) || [],
+              data:
+                data?.map((price) => ({
+                  x: new Date(price.time_open * 1000),
+                  y: [
+                    parseFloat(price.open),
+                    parseFloat(price.high),
+                    parseFloat(price.low),
+                    parseFloat(price.close),
+                  ],
+                })) || [],
             },
           ]}
           options={{
+            chart: {
+              background: "transparent",
+              toolbar: {
+                show: false,
+              },
+            },
             theme: {
               mode: "dark",
             },
-            chart: {
-              height: 300,
-              width: 500,
-              toolbar: { show: false },
-              background: "transparent",
-            },
-            grid: {
-              show: false,
-            },
-            stroke: {
-              curve: "smooth",
-            },
             xaxis: {
-              labels: { show: false },
-              axisBorder: { show: false },
-              axisTicks: { show: false },
               type: "datetime",
-              categories: data?.map(price => price.time_close)
-            },
-            yaxis: {
-              show: false,
-            },
-            fill: {
-              type: "gradient",
-              gradient: { gradientToColors: ["#0be881"], stops: [0, 100] },
-            },
-            colors: ["#0fbcf9"],
-            tooltip: {
-              y: {
-                formatter: (value) => `$ ${value.toFixed(2)}`
-              }
             },
           }}
         />
@@ -74,5 +61,3 @@ function Chart() {
     </div>
   );
 }
-
-export default Chart;

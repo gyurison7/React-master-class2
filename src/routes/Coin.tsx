@@ -1,15 +1,20 @@
 import { useQuery } from "react-query";
-import { Outlet, useLocation, useMatch, useParams } from "react-router-dom";
+import { useLocation, useMatch, useNavigate, useParams } from "react-router-dom";
 import styled from "styled-components";
 import { Link } from "react-router-dom";
 import { fetchCoinInfo, fetchCoinPriceInfo } from "../api";
 import { Helmet } from "react-helmet";
+import { Chart } from "./Chart";
+import { Price } from "./Price";
+import { IPriceData } from "../type";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faArrowLeft, faHouse } from '@fortawesome/free-solid-svg-icons';
 
 interface RouteState {
   name: string;
 }
 
-interface InfoData {
+interface IInfoData {
   id: string;
   name: string;
   symbol: string;
@@ -31,51 +36,18 @@ interface InfoData {
   last_data_at: string;
 }
 
-interface PriceData {
-  id: string;
-  name: string;
-  symbol: string;
-  rank: number;
-  circulating_supply: number;
-  total_supply: number;
-  max_supply: number;
-  beta_value: number;
-  first_data_at: string;
-  last_updated: string;
-  quotes: {
-    USD: {
-      ath_date: string;
-      ath_price: number;
-      market_cap: number;
-      market_cap_change_24h: number;
-      percent_change_1h: number;
-      percent_change_1y: number;
-      percent_change_6h: number;
-      percent_change_7d: number;
-      percent_change_12h: number;
-      percent_change_15m: number;
-      percent_change_24h: number;
-      percent_change_30d: number;
-      percent_change_30m: number;
-      percent_from_price_ath: number;
-      price: number;
-      volume_24h: number;
-      volume_24h_change_24h: number;
-    };
-  };
-}
-
 function Coin() {
   const { coinId } = useParams();
   const { state } = useLocation() as { state: RouteState };
   const priceMatch = useMatch("/:coinId/price");
   const chartMatch = useMatch("/:coinId/chart");
+  const navigate = useNavigate();
 
-  const { isLoading: infoLoading, data: infoData } = useQuery<InfoData>(
+  const { isLoading: infoLoading, data: infoData } = useQuery<IInfoData>(
     ["info", coinId],
     () => fetchCoinInfo(coinId || "")
   );
-  const { isLoading: priceLoading, data: priceData } = useQuery<PriceData>(
+  const { isLoading: priceLoading, data: priceData } = useQuery<IPriceData>(
     ["price", coinId],
     () => fetchCoinPriceInfo(coinId || ""),
     { refetchInterval: 5000 }
@@ -94,6 +66,7 @@ function Coin() {
         </Title>
       </Helmet>
       <Header>
+      <FontAwesomeIcon icon={faArrowLeft} onClick={() => navigate(-1)} style={{cursor: "pointer"}}/>
         <Title>
           {typeof state === "string"
             ? state
@@ -101,6 +74,7 @@ function Coin() {
             ? "Loading..."
             : infoData?.name}
         </Title>
+        <FontAwesomeIcon icon={faHouse} onClick={() => navigate("/")} style={{cursor: "pointer"}}/>
       </Header>
       {loading ? (
         <Loader>Loading...</Loader>
@@ -141,7 +115,11 @@ function Coin() {
             </Tab>
           </Tabs>
 
-          <Outlet />
+          {chartMatch ? (
+            <Chart coinId={coinId} />
+          ) : (
+            <Price priceLoading={priceLoading} priceData={priceData} />
+          )}
         </>
       )}
     </Container>
@@ -157,7 +135,7 @@ const Container = styled.div`
 const Header = styled.header`
   height: 15vh;
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
   margin-bottom: 10px;
 `;
