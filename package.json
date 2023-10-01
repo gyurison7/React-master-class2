@@ -58,5 +58,5 @@
     "@types/react-router-dom": "^5.3.3",
     "@types/styled-components": "^5.1.28"
   },
-  "homepage": "https://gyurison7.github.io/React-master-class-ts"
+  "homepage": "https://gyurison7.github.io/crypto-tracker-clone"
 }
